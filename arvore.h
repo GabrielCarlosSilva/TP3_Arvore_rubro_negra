@@ -1,7 +1,11 @@
-#ifndef ARVORE.H
-#define ARVORE.H
+#ifndef ARVORE_H 
+#define ARVORE_H 
 
-typedef struct item Item;
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct item Pessoa;
 
 struct item{
     int idade;
@@ -9,23 +13,23 @@ struct item{
     char nome[23];
 };
 
-typedef struct RBTree{
-    Item info;
-    struct RBTree* dir;
-    struct RBTree* esq;
+typedef struct rbtree{
+    Pessoa info;
+    struct rbtree* dir;
+    struct rbtree* esq;
     int cor;
 }RBTree;
 
+RBTree* alocarArvore();
+void desalocarArvore(RBTree*);
+void leArvore(RBTree*);
+int insercao(RBTree*, Pessoa);
 
 RBTree* rotacionaEsquerda(RBTree*);
 RBTree* rotacionaDireita(RBTree*);
 
 
-RBTree alocarArvore();
-void desalocarArvore(RBTree* t);
-void leArvore(RBTree* t);
-void insercao();
 void balanceamento();
-void printInOrder();
+void printInOrder(RBTree*);
 
-#endif;
+#endif
