@@ -1,15 +1,8 @@
 #include "arvore.h"
 
-void impPessoa(Pessoa temp){
-    printf("Nome: %s\n", temp.nome);
-    printf("Data de Nascimento: %s\n", temp.nasc);
-    printf("Idade: %d\n", temp.idade);
-}
-
 Pessoa getPessoa(){
     Pessoa temp;
     scanf("%s", temp.nome);
-    scanf("%s", temp.nasc);
     scanf("%d", &temp.idade);
     return temp;
 }
@@ -19,7 +12,6 @@ int main(){
     RBTree* raiz = alocarArvore();
     Pessoa temp;
     int n, entry, flag = 0;    
-    int fault;
     do{
         scanf("%d", &entry);
         switch(entry){
@@ -27,7 +19,7 @@ int main(){
             scanf("%d", &n);
             for(int i = 0; i < n; i++){
                 temp = getPessoa();
-                insercao(raiz, temp);
+                insercao(&raiz, temp);
             }
             break;
         case 2:
@@ -40,6 +32,6 @@ int main(){
         }
     }while(flag != 1);
 
-    desalocarArvore(raiz);
+    //desalocarArvore(raiz);
     return 0;
 }

@@ -4,12 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 typedef struct item Pessoa;
 
 struct item{
     int idade;
-    char nasc[11];
     char nome[23];
 };
 
@@ -23,13 +23,13 @@ typedef struct rbtree{
 RBTree* alocarArvore();
 void desalocarArvore(RBTree*);
 void leArvore(RBTree*);
-int insercao(RBTree*, Pessoa);
+bool insercao(RBTree**, Pessoa);
 
 RBTree* rotacionaEsquerda(RBTree*);
 RBTree* rotacionaDireita(RBTree*);
 
 
-void balanceamento();
+int balanceamento(RBTree**);
 void printInOrder(RBTree*);
 
 #endif
