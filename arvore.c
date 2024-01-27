@@ -1,136 +1,139 @@
 #include "arvore.h"
 
+//  Constantes que definem as cores do node
 #define RED 1
 #define BLACK 0
 
-RBTree* alocarArvore(){
-    RBTree* raiz = (RBTree*) malloc(sizeof(RBTree));
-    if(raiz != NULL)
-        raiz = NULL;
-    return raiz;
-}
-
-void liberaNo(RBTree* no){
-    if(no == NULL)
+void desaloca(RBTree* node){
+    if(node == NULL)
         return;
-    liberaNo(no->esq);
-    liberaNo(no->dir);
-    free(no);
-    no = NULL;    
+    desaloca(node->dir);
+    desaloca(node->esq);
+    free(node);
 }
 
-void desalocarArvore(RBTree* raiz){ 
-    if(raiz == NULL)
-        return;
-    liberaNo(raiz);
-    free(raiz);
+
+// Inserção na árvore binaria
+RBTree* insersao(RBTree* X, RBTree* inserido){
+    // Se a árvore é vazia retorna o novo node
+    if(X == NULL)
+        return inserido;
+
+    // Caso contrário percorre a árvore
+    if(inserido->info.idade < X->info.idade){
+        X->esq = insersao(X->esq, inserido);
+        X->esq->pai = X;
+    } else if(inserido->info.idade > X->info.idade){
+        X->dir = insersao(X->dir, inserido);
+        X->dir->pai = X;
+    }
+
+    // Retorna o ponteiro sem alterações
+    return X;
 }
 
-// Implementação: no = rotaciona(no)
-RBTree* rotacionaEsquerda(RBTree* no){
-    if(no == NULL) return NULL;
-    RBTree *aux = no->dir;
-    no->dir = aux->esq;
-    aux->esq = no;
-    aux->cor = no->cor;
-    no->cor = RED;
-    return aux;
+// Rotação a esquerda
+void rotacionaEsquerda(RBTree* X, RBTree** raiz){
+    RBTree* Y = X->dir;         // Cria ponteiro de node para a direita de X
+    X->dir = Y->esq;            // Sub-Arvore a esquerda de Y passa para direita de X
+    if(X->dir != NULL)          // Caso a direita de X não seja um nó folha (NULL) corrige o parentesco
+        X->dir->pai = X;
+    Y->pai = X->pai;            // Corrige o parentesco de Y
+    if(X->pai == NULL)          // Se X for a raiz, atualiza o sentinela
+        *raiz = Y;               
+    else if(X == X->pai->esq)   // Corrige o ponteiro do pai caso X esteja a esquerda do pai
+        X->pai->esq = Y;
+    else                        // Corrige o ponteiro do pai caso X esteja a direita do pai
+        X->pai->dir = Y;
+    Y->esq = X;                 // Coloca X "abaixo" de Y
+    X->pai = Y;                 // Corrige o parentesco
 }
 
-// Implementação: no = rotaciona(no)
-RBTree* rotacionaDireita(RBTree* no){
-    if(no == NULL) return NULL;
-    RBTree *aux = no->esq;
-    no->esq = aux->dir;
-    aux->dir = no;
-    aux->cor = no->cor;
-    no->cor = RED;
-    return aux;
+// Rotação a direita
+void rotacionaDireita(RBTree* X, RBTree** raiz){
+    RBTree* Y = X->esq;         // Cria ponteiro de node para a esquerda de X
+    X->esq = Y->dir;            // Sub-Arvore a direita de Y passa para esquerda de X
+    if(X->esq)                  // Caso a esquerda de X não seja um nó folha (NULL) corrige o parentesco
+        X->esq->pai = X;
+    Y->pai = X->pai;            // Corrige o parentesco de Y
+    if(!X->pai)                 // Se X for a raiz, atualiza o sentinela
+        *raiz = Y;
+    else if(X == X->pai->esq)   // Corrige o ponteiro do pai caso X esteja a esquerda do pai
+        X->pai->esq = Y;
+    else
+        X->pai->dir = Y;        // Corrige o ponteiro do pai caso X esteja a direita do pai
+    Y->dir = X;                 // Coloca X "abaixo" de Y
+    X->pai = Y;                 // Corrige o parentesco
 }
 
-int cor(RBTree* no){
-    if(no == NULL)
-        return BLACK;
-    return no->cor;
-}
+// Balanceamento
+void balanceamento(RBTree** raiz, RBTree* X){
+    RBTree* pai_de_X = NULL;
+    RBTree* avo_de_X = NULL;
 
-void trocaCor(RBTree** no){
-    (*no)->cor = !(*no)->cor;
-    if((*no)->esq != NULL)
-        (*no)->esq->cor = !(*no)->esq->cor;
-    if((*no)->dir != NULL)
-        (*no)->dir->cor = !(*no)->dir->cor;
-}
+    while ((X != *raiz) && (X->cor != BLACK) && (X->pai->cor == RED)){
+        pai_de_X = X->pai;
+        avo_de_X = X->pai->pai;
 
-int itemChecker(Pessoa i1, Pessoa i2){
-    if(!strcmp(i1.nome, i2.nome) || i1.idade == i2.idade)
-        return 1;
-    return 0;
-}
-
-void transferData(Pessoa *p1, Pessoa p2){
-    strcpy(p1->nome, p2.nome);
-    p1->idade = p2.idade;
-}
-
-RBTree* criaNo(Pessoa insert){
-    RBTree* temp = (RBTree*) malloc(sizeof(RBTree));
-    transferData(&temp->info, insert);
-    temp->cor = BLACK;
-    temp->dir = NULL;
-    temp->esq = NULL;
-    return temp;
-}
-
-int balanceamento(RBTree** raiz){
-    if(cor((*raiz)->dir) == RED && cor((*raiz)->dir->dir) == RED) // Dois vermelhos seguidos na direita
-        *raiz = rotacionaEsquerda(*raiz);
-    if(cor((*raiz)->esq) == RED && cor((*raiz)->esq->esq) == RED) // Dois vermelhos seguidos na esquerda
-        *raiz = rotacionaDireita(*raiz);
-    if(cor((*raiz)->esq) == RED && cor((*raiz)->dir) == RED)      // Ambos os filhos vermelhos
-        trocaCor(raiz);    
-}
-
-bool insercao(RBTree** raiz, Pessoa inserido){
-    if(*raiz == NULL){
-        *raiz = criaNo(inserido);
-        return true;
-    }else if(itemChecker(inserido, (*raiz)->info)){
-        return false;
-    }else if(inserido.idade < (*raiz)->info.idade){
-        if(insercao(&(*raiz)->esq, inserido)){
-            if(balanceamento(raiz))
-                return false ;
-            else
-                return true ;
-        }
-    }else if(inserido.idade > (*raiz)->info.idade){
-        if(insercao(&(*raiz)->dir, inserido)){
-            if(balanceamento(raiz))
-                return false ;
-            else
-                return true ;
+        if(pai_de_X == avo_de_X->esq){  // CASO 1: pai de X está a esquerda do avó de X
+            RBTree* tio_de_X = avo_de_X->dir;
+                                        // CASO 1.1: o tio é vermelho (apenas troca a cor)
+            if((tio_de_X != NULL && tio_de_X->cor == RED)){
+                avo_de_X->cor = RED;
+                pai_de_X->cor = BLACK;
+                tio_de_X->cor = BLACK;
+                X = avo_de_X;
+            } else { 
+                if(X == pai_de_X->dir){ // CASO 1.2: X é o filho a direita (rotação a esquerda necessária)
+                    rotacionaEsquerda(pai_de_X, raiz);
+                    X = pai_de_X;
+                    pai_de_X = X->pai;
+                }
+                                        // CASO 1.3: X é o filho a esquerda (Rotação a direita necessária)
+                rotacionaDireita(avo_de_X, raiz);
+                int temp = pai_de_X->cor;
+                pai_de_X->cor = avo_de_X->cor;
+                avo_de_X->cor = temp;
+                X = pai_de_X;
+            }        
+        }else{                          // CASO 2: pai de X está a direita do avó de X
+            RBTree* tio_de_X = avo_de_X->esq;
+                                        // CASO 2.1: o tio é vermelho (apenas troca a cor)
+            if((tio_de_X != NULL && tio_de_X->cor == RED)){
+                avo_de_X->cor = RED;
+                pai_de_X->cor = BLACK;
+                tio_de_X->cor = BLACK;
+                X = avo_de_X;  
+            } else {
+                if(X == pai_de_X->esq){ // CASO 2.2: X é o filho a esquerda (rotação a direita necessária)
+                    rotacionaDireita(pai_de_X, raiz);
+                    X = pai_de_X;
+                    pai_de_X = X->pai;
+                }
+                                        // CASO 2.3: X é o filho a direita (rotação a esquerda necessária)
+                rotacionaEsquerda(avo_de_X, raiz);
+                int temp = pai_de_X->cor;
+                pai_de_X->cor = avo_de_X->cor;
+                avo_de_X->cor = temp;
+                X = pai_de_X;   
+            } 
         }
     }
-    return false;
+    (*raiz)->cor = BLACK;
 }
 
-void imprimePessoa(Pessoa temp){
-    printf("Nome: %s\n", temp.nome);
-    printf("Idade: %d\n", temp.idade);
+// Imprime o tipo pessoa segundo os parametros
+void imprimePessoa(Pessoa p){
+    printf("Nome: %s\n", p.nome);
+    printf("Idade: %d\n", p.idade);
 }
 
-void printInOrder(RBTree* raiz){
-    if(raiz == NULL)
+//  Função que imprime em ordem
+void inOrder(RBTree* X){
+    if(X == NULL)
         return;
-    printInOrder(raiz->esq);
-    imprimePessoa(raiz->info);
-
-    if(raiz->cor = BLACK)
-        printf("PRETO\n");
-    else
-        printf("VERMELHO\n");
-
-
-    printInOrder(raiz->dir);
+    inOrder(X->esq);
+    imprimePessoa((*X).info);
+    //printf("Cor %d\n\n", X->cor);
+    inOrder(X->dir);
 }
