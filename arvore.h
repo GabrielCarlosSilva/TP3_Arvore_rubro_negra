@@ -28,7 +28,7 @@ void balanceamento(RBTree**, RBTree*);
 void inOrder(RBTree*);
 
 Pessoa getPessoa();
-void transferData(Pessoa*, Pessoa);
-RBTree* leArvore(Pessoa);
+void leArvore(Pessoa*, Pessoa);
+RBTree* alocaArvore(Pessoa);
 
 #endif

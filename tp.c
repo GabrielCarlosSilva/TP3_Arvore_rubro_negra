@@ -15,7 +15,7 @@ int main(){
             scanf("%d", &n);
             for (int i = 0; i < n; i++){
                 tempPessoa = getPessoa();
-                tempNode = leArvore(tempPessoa);
+                tempNode = alocaArvore(tempPessoa);
                 raiz = insersao(raiz, tempNode);
                 balanceamento(&raiz, tempNode);
             }

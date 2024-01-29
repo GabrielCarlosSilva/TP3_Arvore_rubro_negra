@@ -15,7 +15,7 @@ void desaloca(RBTree* node){
 
 // Inserção na árvore binaria
 RBTree* insersao(RBTree* X, RBTree* inserido){
-    // Se a árvore é vazia retorna o novo node
+    // Se um nó folha foi atingido, retorna o novo node
     if(X == NULL)
         return inserido;
 
@@ -137,7 +137,6 @@ void inOrder(RBTree* X){
     inOrder(X->dir);
 }
 
-
 Pessoa getPessoa(){
     Pessoa temp;
     scanf("%s", temp.nome);
@@ -145,17 +144,17 @@ Pessoa getPessoa(){
     return temp;
 }
 
-void transferData(Pessoa* i1, Pessoa i2){
+void leArvore(Pessoa* i1, Pessoa i2){
     i1->idade = i2.idade;
     strcpy(i1->nome, i2.nome);
 }
 
-RBTree* leArvore(Pessoa Temp){
+RBTree* alocaArvore(Pessoa Temp){
     RBTree* X = (RBTree*)malloc(sizeof(RBTree));
     X->dir = NULL;
     X->esq = NULL;
     X->pai = NULL;
     X->cor = 1;
-    transferData(&X->info, Temp);
+    leArvore(&X->info, Temp);
     return X;
 }
